@@ -6,9 +6,11 @@
 ///////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <cstdint>
 #include <ctime>
 #include <iostream>
 
+// Disable heavyweight features via macros for this example.
 #define WIDE_DECIMAL_DISABLE_IOSTREAM
 #define WIDE_DECIMAL_DISABLE_DYNAMIC_MEMORY_ALLOCATION
 #define WIDE_DECIMAL_DISABLE_CONSTRUCT_FROM_STRING

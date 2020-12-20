@@ -39,23 +39,20 @@
       constexpr dynamic_array() : elem_count(0U),
                                   elems     (nullptr) { }
 
-      dynamic_array(size_type count)
-        : elem_count(count),
-          elems     (elem_count > 0U ? allocator_type().allocate(elem_count) : nullptr)
-      {
-        for(size_type i = 0U; i < elem_count; i++)
-        {
-          allocator_type().construct(&elems[i], value_type());
-        }
-      }
-
       dynamic_array(size_type count,
-                    const value_type& v,
+                    const_reference v = value_type(),
                     const allocator_type& a = allocator_type())
         : elem_count(count),
           elems     (elem_count > 0U ? allocator_type(a).allocate(elem_count) : nullptr)
       {
-        fill(v);
+        iterator it = begin();
+
+        while(it != end())
+        {
+          allocator_type(a).construct(it, v);
+
+          ++it;
+        }
       }
 
       dynamic_array(const dynamic_array& other)
@@ -123,6 +120,7 @@
       // Move assignment operator.
       dynamic_array& operator=(dynamic_array&& other)
       {
+        // Destroy the elements and deallocate the range.
         pointer p = elems;
 
         while(p != elems + elem_count)
@@ -132,7 +130,6 @@
           ++p;
         }
 
-        // Deallocate the elements and deallocate the range.
         allocator_type().deallocate(elems, elem_count);
 
         elem_count = other.elem_count;
@@ -187,6 +184,18 @@
       }
 
       void swap(dynamic_array& other)
+      {
+        const size_type tmp_elem_count = elem_count;
+        const pointer   tmp_elems      = elems;
+
+        elem_count = other.elem_count;
+        elems      = other.elems;
+
+        other.elem_count = tmp_elem_count;
+        other.elems      = tmp_elems;
+      }
+
+      void swap(dynamic_array&& other)
       {
         const size_type tmp_elem_count = elem_count;
         const pointer   tmp_elems      = elems;
