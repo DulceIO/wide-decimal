@@ -1,9 +1,9 @@
-///////////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2012 - 2020.                 //
-//  Distributed under the Boost Software License,                //
-//  Version 1.0. (See accompanying file LICENSE_1_0.txt          //
-//  or copy at http://www.boost.org/LICENSE_1_0.txt)             //
-///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//  Copyright Christopher Kormanyos 2012 - 2021.
+//  Distributed under the Boost Software License,
+//  Version 1.0. (See accompanying file LICENSE_1_0.txt
+//  or copy at http://www.boost.org/LICENSE_1_0.txt)
+//
 
 #ifndef UTIL_DYNAMIC_ARRAY_2012_05_16_H_
   #define UTIL_DYNAMIC_ARRAY_2012_05_16_H_
@@ -36,30 +36,41 @@
       using const_reverse_iterator =       std::reverse_iterator<const_iterator>;
 
       // Constructors.
-      constexpr dynamic_array() : elem_count(0U),
-                                  elems     (nullptr) { }
-
-      dynamic_array(size_type count,
-                    const_reference v = value_type(),
-                    const allocator_type& a = allocator_type())
+      dynamic_array(size_type             count = size_type(0U),
+                    const_reference       v     = value_type(),
+                    const allocator_type& a     = allocator_type())
         : elem_count(count),
-          elems     (elem_count > 0U ? allocator_type(a).allocate(elem_count) : nullptr)
+          elems     (nullptr)
       {
-        iterator it = begin();
-
-        while(it != end())
+        if(elem_count > 0U)
         {
-          allocator_type(a).construct(it, v);
+          allocator_type my_a(a);
 
-          ++it;
+          elems = std::allocator_traits<allocator_type>::allocate(my_a, elem_count);
+
+          iterator it = begin();
+
+          while(it != end())
+          {
+            std::allocator_traits<allocator_type>::construct(my_a, it, v);
+
+            ++it;
+          }
         }
       }
 
       dynamic_array(const dynamic_array& other)
         : elem_count(other.size()),
-          elems     (elem_count > 0U ? allocator_type().allocate(elem_count) : nullptr)
+          elems     (nullptr)
       {
-        std::copy(other.elems, other.elems + elem_count, elems);
+        if(elem_count > 0U)
+        {
+          allocator_type my_a;
+
+          elems = std::allocator_traits<allocator_type>::allocate(my_a, elem_count);
+
+          std::copy(other.elems, other.elems + elem_count, elems);
+        }
       }
 
       template<typename input_iterator>
@@ -67,17 +78,31 @@
                     input_iterator last,
                     const allocator_type& a = allocator_type())
         : elem_count(static_cast<size_type>(std::distance(first, last))),
-          elems     (elem_count > 0U ? allocator_type(a).allocate(elem_count) : nullptr)
+          elems     (nullptr)
       {
-        std::copy(first, last, elems);
+        if(elem_count > 0U)
+        {
+          allocator_type my_a(a);
+
+          elems = std::allocator_traits<allocator_type>::allocate(my_a, elem_count);
+
+          std::copy(first, last, elems);
+        }
       }
 
       dynamic_array(std::initializer_list<value_type> lst,
                     const allocator_type& a = allocator_type())
         : elem_count(lst.size()),
-          elems     (elem_count > 0U ? allocator_type(a).allocate(elem_count) : nullptr)
+          elems     (nullptr)
       {
-        std::copy(lst.begin(), lst.end(), elems);
+        if(elem_count > 0U)
+        {
+          allocator_type my_a(a);
+
+          elems = std::allocator_traits<allocator_type>::allocate(my_a, elem_count);
+
+          std::copy(lst.begin(), lst.end(), elems);
+        }
       }
 
       // Move constructor.
@@ -93,15 +118,17 @@
       {
         pointer p = elems;
 
+        allocator_type my_a;
+
         while(p != elems + elem_count)
         {
-          allocator_type().destroy(p);
+          std::allocator_traits<allocator_type>::destroy(my_a, p);
 
           ++p;
         }
 
         // Destroy the elements and deallocate the range.
-        allocator_type().deallocate(elems, elem_count);
+        std::allocator_traits<allocator_type>::deallocate(my_a, elems, elem_count);
       }
 
       // Assignment operator.
@@ -123,14 +150,16 @@
         // Destroy the elements and deallocate the range.
         pointer p = elems;
 
+        allocator_type my_a;
+
         while(p != elems + elem_count)
         {
-          allocator_type().destroy(p);
+          std::allocator_traits<allocator_type>::destroy(my_a, p);
 
           ++p;
         }
 
-        allocator_type().deallocate(elems, elem_count);
+        std::allocator_traits<allocator_type>::deallocate(my_a, elems, elem_count);
 
         elem_count = other.elem_count;
         elems      = other.elems;

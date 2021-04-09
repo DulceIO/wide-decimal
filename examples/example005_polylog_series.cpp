@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////
-//  Copyright Christopher Kormanyos 2020.                        //
+//  Copyright Christopher Kormanyos 2020 - 2021.                 //
 //  Distributed under the Boost Software License,                //
 //  Version 1.0. (See accompanying file LICENSE_1_0.txt          //
 //  or copy at http://www.boost.org/LICENSE_1_0.txt)             //
@@ -44,13 +44,13 @@ namespace local
 
 bool math::wide_decimal::example005_polylog_series()
 {
-  using dec101_t = math::wide_decimal::decwide_t<101>;
+  using dec101_t = math::wide_decimal::decwide_t<101U>;
 
   using std::fabs;
 
-  // N[PolyLog[7, 17/71], 101]
   const dec101_t poly = local::polylog(7U, dec101_t(17U) / 71U);
 
+  // N[PolyLog[7, 17/71], 101]
   const dec101_t control
   {
     "0.23989099751201076665599565769828454152030927256642802570721839696637617308754054721620440634024352282"
