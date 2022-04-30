@@ -9,6 +9,14 @@
 [![Boost Software License 1.0](https://img.shields.io/badge/license-BSL%201.0-blue.svg)](https://github.com/ckormanyos/wide-decimal/blob/master/LICENSE_1_0.txt)
 [![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/ckormanyos/wide-decimal)](https://github.com/ckormanyos/wide-decimal)
 
+The author is https://github.com/ckormanyos
+
+The DulceIO copy is for backup and to facilitate contributions to the upstream repo.
+
+A Very Very Very Thanks to Christopher Kormanyos for making this lib available.
+We really love his libs.
+-----------------------
+
 Wide-decimal implements a generic C++ template for extended precision decimal float types.
 
 This C++ template header-only library implements drop-in big decimal float types,
